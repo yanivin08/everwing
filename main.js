@@ -10,6 +10,9 @@ bgCanvas.height = div.clientHeight;
 canvas.width = div.clientWidth;
 canvas.height = div.clientHeight;
 
+let minX = canvas.width * .05,
+    maxX = canvas.width - (canvas.width*.15);
+
 let gameBox = canvas.getBoundingClientRect();
 let postX = canvas.width/2,
 	postY = canvas.height - canvas.height * .08,
@@ -39,16 +42,19 @@ class background{
 }
 
 class games{
-	constructor(x,y,left,right){
+	constructor(x,y,adj,post){
+		this.enemy = Math.random() >= 0.5;//true;
+		this.gun = true;
+		this.life = true;
 		this.x = x;
 		this.y = y;
-		this.spaceRad = 50;
+		this.spaceRad = 20;
 		this.gunX = x;
 		this.gunY = y;
-		this.gunLeft = left;
-		this.gunRight = right;
-		this.enemyY = -100;
-		this.enemyX = Math.floor((Math.random() * canvas.width - (canvas.width*15)) + canvas.width * .05);
+		this.offset = adj;
+		this.gunPlace = post;
+		this.enemyY = -10;
+		this.enemyX = Math.random() * (maxX - minX) + minX;
 		this.spaceImg = new Image;
 		this.spaceImg.src = "space.png";
 		this.shootImg = new Image;
@@ -63,10 +69,10 @@ class games{
 		//draw canvas with the new coordinates
 		if(this.x-this.spaceImg.width*.12/2 > canvas.width*.03 && this.x-this.spaceImg.width*.12/2 < canvas.width - (canvas.width*.15) &&
 			this.y-this.spaceImg.height*.12/2 > canvas.height*.03 && this.y-this.spaceImg.height*.12/2 < canvas.height - (canvas.height*.15)){
-			ctx.beginPath();
+			/*ctx.beginPath();
 			ctx.arc(this.x,this.y,this.spaceRad,0,2*Math.PI);
 			ctx.stroke();
-			ctx.closePath();
+			ctx.closePath();*/
 			
 			ctx.drawImage(this.spaceImg,this.x-this.spaceImg.width*.12/2,this.y-this.spaceImg.height*.12/2,this.spaceImg.width*.12,this.spaceImg.height*.12);
 		}else if(this.x-this.spaceImg.width*.12/2 < canvas.width*.03){
@@ -88,15 +94,28 @@ class games{
 	}
 	triggerShoot(){
 		this.gunY -= 8;
-		ctx.drawImage(this.shootImg,this.gunX-this.gunLeft,this.gunY,this.shootImg.width*.05,this.shootImg.height*.05);
-		ctx.drawImage(this.shootImg,this.gunX+this.gunRight,this.gunY,this.shootImg.width*.05,this.shootImg.height*.05);
+		if(this.gunPlace == "left"){
+			/*ctx.beginPath();
+			ctx.arc(this.gunX-this.offset,this.gunY,15,0,2*Math.PI);
+			ctx.strokeStyle = "white"
+			ctx.stroke();
+			ctx.closePath();*/
+			ctx.drawImage(this.shootImg,this.gunX-this.offset-(this.shootImg.width*.06/2),this.gunY-(this.shootImg.height*.06/2),this.shootImg.width*.06,this.shootImg.height*.06);
+		}else if(this.gunPlace == "right"){
+			/*ctx.beginPath();
+			ctx.arc(this.gunX+this.offset,this.gunY,15,0,2*Math.PI);
+			ctx.strokeStyle = "white"
+			ctx.stroke();
+			ctx.closePath();*/
+			ctx.drawImage(this.shootImg,this.gunX+this.offset-(this.shootImg.width*.06/2),this.gunY-(this.shootImg.height*.06/2),this.shootImg.width*.06,this.shootImg.height*.06);
+		}
 	}
 	getEnemy(){
 
-		this.enemyY += 5;
-		
+		this.enemyY += 3;
 		ctx.beginPath();
-		ctx.arc(this.enemyX,this.enemyY,50,0,2*Math.PI);
+		ctx.arc(this.enemyX,this.enemyY,this.spaceRad,0,2*Math.PI);
+		ctx.fillStyle = "white";
 		ctx.fill();
 		ctx.stroke();
 		ctx.closePath();
@@ -108,7 +127,6 @@ function start(){
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	//game.drawShip();
 	count -= 1;
-	gameArr.forEach(x => x.drawShip());
 	if(count == 0){
 		//console.log(gameArr);
 		game = new games(postX,postY,35,25);
@@ -119,10 +137,10 @@ function start(){
 		count = 20;
 	}
 	
+	gameArr.forEach(x => x.gun == true ? x.triggerShoot() : 0);
+	gameArr.forEach(x => x.enemy == true ? x.getEnemy() : 0);
 	gameArr.forEach(x => x.drawShip());
-	gameArr.forEach(x => x.triggerShoot());
-	gameArr.forEach(x => x.getEnemy());
-	gameArr = gameArr.filter(x => x.gunY > 0);
+	gameArr = gameArr.filter(x => x.life == true);
 	//gameArr = gameArr.filter(x =>)
 	createBg.drawBackground();
 	requestAnimationFrame(start);
