@@ -122,40 +122,45 @@ class games{
 	}
 	
 	gameCollision(){
-		gameArr.forEach(x => {
-			let prodX = this.gunX - x.enemyX,
-				prodY = this.gunY - x.enemyY;
-			let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
-			if(dist <= (15 + this.spaceRad)){
-				x.enemy = false;
-				//x.gun = false;
-				//this.life = false;
-			}
-		});
-		
-		/*let prodX = this.gunX - this.enemyX,
-			prodY = this.gunY - this.enemyY;
-		let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
-		if(dist <= (15 + this.spaceRad)){
+		if(this.gunPlace == "left"){
+			gameArr.forEach(x => {
+				let prodX = (this.gunX-this.offset) - x.enemyX,
+					prodY = this.gunY - x.enemyY;
+				let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+				if(dist <= (15 + this.spaceRad)){
+					this.enemyLife -= 1;
+					this.gun = false;
+					if(this.enemyLife == 0){
+						x.enemy = false;
+					}
+				}
+			});
+		}else if(this.gunPlace == "right"){
+			gameArr.forEach(x => {
+				let prodX = (this.gunX+this.offset) - x.enemyX,
+					prodY = this.gunY - x.enemyY;
+				let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+				if(dist <= (15 + this.spaceRad)){
+					this.enemyLife -= 1;
+					this.gun = false;
+					if(this.enemyLife == 0){
+						x.enemy = false;
+					}
+				}
+			});
+		}
+
+		if(this.gunY < 0 && this.enemyY > canvas.height){
 			this.life = false;
-		}*/
-		
+		}else if(this.gun == false && this.enemy == false){
+			this.life = false;
+		}else if(this.gunY < 0 && this.enemy == false){
+			this.life = false;
+		}else if(this.gun == false && this.enemyY > canvas.height){
+			this.life = false;
+		}
 	}
 }
-
-function collision(obj){
-	gameArr.forEach(x => {
-		let prodX = obj.gunX - x.enemyX,
-			prodY = obj.gunY - x.enemyY;
-			let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
-			if(dist <= (15 + obj.spaceRad)){
-				x.enemy = false;
-				//obj.gun = false;
-			}
-	});
-	
-}
-
 
 function start(){
 	ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -173,9 +178,9 @@ function start(){
 	
 	gameArr.forEach(x => x.gun == true ? x.triggerShoot() : 0);
 	gameArr.forEach(x => x.enemy == true ? x.getEnemy() : 0);
+	gameArr.forEach(x => x.gameCollision());
 	gameArr.forEach(x => x.drawShip());
 	gameArr = gameArr.filter(x => x.life == true);
-	//gameArr = gameArr.filter(x =>)
 	createBg.drawBackground();
 	requestAnimationFrame(start);
 }
