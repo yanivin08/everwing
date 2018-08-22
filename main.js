@@ -120,6 +120,40 @@ class games{
 		ctx.stroke();
 		ctx.closePath();
 	}
+	
+	gameCollision(){
+		gameArr.forEach(x => {
+			let prodX = this.gunX - x.enemyX,
+				prodY = this.gunY - x.enemyY;
+			let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+			if(dist <= (15 + this.spaceRad)){
+				x.enemy = false;
+				//x.gun = false;
+				//this.life = false;
+			}
+		});
+		
+		/*let prodX = this.gunX - this.enemyX,
+			prodY = this.gunY - this.enemyY;
+		let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+		if(dist <= (15 + this.spaceRad)){
+			this.life = false;
+		}*/
+		
+	}
+}
+
+function collision(obj){
+	gameArr.forEach(x => {
+		let prodX = obj.gunX - x.enemyX,
+			prodY = obj.gunY - x.enemyY;
+			let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+			if(dist <= (15 + obj.spaceRad)){
+				x.enemy = false;
+				//obj.gun = false;
+			}
+	});
+	
 }
 
 
