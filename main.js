@@ -20,6 +20,8 @@ let postX = canvas.width/2,
 	
 let keyPress = {a:0,w:0,d:0,s:0}
 
+let thisGame = true;
+
 class background{
 	constructor(){
 		//initialized background
@@ -49,7 +51,7 @@ class games{
 		this.enemyLife = 5;
 		this.x = x;
 		this.y = y;
-		this.spaceRad = 40;
+		this.spaceRad = 15;
 		this.gunX = x;
 		this.gunY = y;
 		this.offset = adj;
@@ -116,13 +118,13 @@ class games{
 	}
 	getEnemy(){
 			this.enemyY += this.enemySpeed;
-			/*ctx.beginPath();
+			ctx.beginPath();
 			ctx.arc(this.enemyX,this.enemyY,this.spaceRad,0,2*Math.PI);
 			ctx.fillStyle = "white";
 			ctx.fill();
-			ctx.closePath();*/
+			ctx.closePath();
 			//ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.25/2),this.enemyY-(this.enemyImg.height*.25/2),this.enemyImg.width*.25,this.fireImg.enemyImg*.25);
-			ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.12/2),this.enemyY-(this.enemyImg.height*.12/2),this.enemyImg.width*.12,this.enemyImg.height*.12);
+			//ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.12/2),this.enemyY-(this.enemyImg.height*.12/2),this.enemyImg.width*.12,this.enemyImg.height*.12);
 	}		
 	getBoss(){
 		
@@ -142,34 +144,45 @@ class games{
 		}
 	}
 	gameCollision(){
+		//test the current fire
+		//left fire
 		if(this.gunPlace == "left"){
+			//loop through all object in array for the enemy collision
 			gameArr.forEach(x => {
-				let prodX = (this.gunX-this.offset) - x.enemyX,
-					prodY = this.gunY - x.enemyY;
-				let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+				let distX = (this.gunX-this.offset) - x.enemyX,
+					distY = this.gunY - x.enemyY;
+				let dist = Math.sqrt(Math.pow(distX,2) + Math.pow(distY,2));
 				if(dist <= (15 + this.spaceRad)){
-					this.enemyLife -= 1;
+					//once collide dec enemys life
+					x.enemyLife -= 1;
 					this.gun = false;
-					if(this.enemyLife == 0){
+					if(x.enemyLife == 0){
+						//if life is zero make it false
 						x.enemy = false;
 					}
 				}
 			});
+		//right fire
 		}else if(this.gunPlace == "right"){
+			//loop through all object in array for the enemy collision
 			gameArr.forEach(x => {
-				let prodX = (this.gunX+this.offset) - x.enemyX,
-					prodY = this.gunY - x.enemyY;
-				let dist = Math.sqrt(Math.pow(prodX,2) + Math.pow(prodY,2));
+				let distX = (this.gunX+this.offset) - x.enemyX,
+					distY = this.gunY - x.enemyY;
+				let dist = Math.sqrt(Math.pow(distX,2) + Math.pow(distY,2));
 				if(dist <= (15 + this.spaceRad)){
-					this.enemyLife -= 1;
+					//once collide dec enemys life
+					x.enemyLife -= 1;
 					this.gun = false;
-					if(this.enemyLife == 0){
+					if(x.enemyLife == 0){
+						//if life is zero make it false
 						x.enemy = false;
 					}
 				}
 			});
 		}
-
+		
+		
+		//change life from true to false if the obj is not needed anymore.
 		if(this.gunY < 0 && this.enemyY > canvas.height && this.type == 'none'){
 			this.life = false;
 		}else if(this.gun == false && this.enemy == false && this.type == 'none'){
@@ -182,14 +195,29 @@ class games{
 			this.life = false;
 		}
 	}
+	enemyCollide(){
+		gameArr.forEach(x => {
+			let distEnemyX = this.x - x.enemyX,
+				distEnemyY = this.y - x.enemyY,
+				distFireX = this.x - x.fireX,
+				distFireY = this.y - x.fireY;
+			let distEnemy = Math.sqrt(Math.pow(distEnemyX,2) + Math.pow(distEnemyY,2)),
+				distFire = Math.sqrt(Math.pow(distFireX,2) + Math.pow(distFireY,2));
+			
+			if(distEnemy <= (30 + this.spaceRad) || distFire <= (60)){
+					//once collide dec enemys life
+					thisGame = false;
+			}
+		});
+	}
 }
 
 
 function start(){
 	ctx.clearRect(0,0,canvas.width,canvas.height);
-	//game.drawShip();
 	count -= 1;
 	fire -= 1;	
+	//autofire
 	if(count == 0){
 		game = new games(postX,postY,35,'left','none');
 		gameArr.push(game);
@@ -197,29 +225,33 @@ function start(){
 		gameArr.push(game);
 		count = 20;
 	}
+	//countdown for fireball
 	if(fire == 0){
 		game = new games(postX,postY,0,'none','fire');
 		gameArr.push(game);
-		fire = 500
+		fire = parseInt(Math.random() * (500 - 50) + 50);
 	}
-	
+	//draw fireball
 	gameArr.forEach(x => x.getFireball());
+	//draw auto fire
 	gameArr.forEach(x => x.gun == true && x.type == 'none' ? x.triggerShoot() : 0);
+	//draw enemy
 	gameArr.forEach(x => x.enemy == true && x.type == 'none' ? x.getEnemy() : 0);
-	
-	//gameArr.forEach(x => x.getEnemy());
+	//check fire and enemy collision
 	gameArr.forEach(x => x.gameCollision());
-	
-	
-	
-	//gameArr.forEach(x => collision(x));
+	gameArr.forEach(x => x.enemyCollide());
+	//draw ships
 	gameArr.forEach(x => x.drawShip());
+	//filter arr. remove those not in need
 	gameArr = gameArr.filter(x => x.life == true);
+	//animate background
 	createBg.drawBackground();
-	requestAnimationFrame(start);
-
+	if(thisGame){
+		requestAnimationFrame(start);
+	}
 }
 
+//on key down function
 window.onkeydown = function(e){
 	if(e.key == 'a' || e.key == 'ArrowLeft'){
 		keyPress.a = 5
@@ -232,6 +264,7 @@ window.onkeydown = function(e){
 	}
 }
 
+//on key up function
 window.onkeyup = function(){
 	keyPress = {a:0,s:0,d:0,w:0};
 }
