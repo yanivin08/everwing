@@ -51,7 +51,7 @@ class games{
 		this.enemyLife = 5;
 		this.x = x;
 		this.y = y;
-		this.spaceRad = 15;
+		this.spaceRad = 20;
 		this.gunX = x;
 		this.gunY = y;
 		this.offset = adj;
@@ -106,25 +106,25 @@ class games{
 			ctx.strokeStyle = "white"
 			ctx.stroke();
 			ctx.closePath();*/
-			ctx.drawImage(this.shootImg,this.gunX-this.offset-(this.shootImg.width*.06/2),this.gunY-(this.shootImg.height*.06/2),this.shootImg.width*.06,this.shootImg.height*.06);
+			ctx.drawImage(this.shootImg,this.gunX-this.offset-(this.shootImg.width*.08/2),this.gunY-(this.shootImg.height*.08/2),this.shootImg.width*.08,this.shootImg.height*.08);
 		}else if(this.gunPlace == "right"){
 			/*ctx.beginPath();
 			ctx.arc(this.gunX+this.offset,this.gunY,15,0,2*Math.PI);
 			ctx.strokeStyle = "white"
 			ctx.stroke();
 			ctx.closePath();*/
-			ctx.drawImage(this.shootImg,this.gunX+this.offset-(this.shootImg.width*.06/2),this.gunY-(this.shootImg.height*.06/2),this.shootImg.width*.06,this.shootImg.height*.06);
+			ctx.drawImage(this.shootImg,this.gunX+this.offset-(this.shootImg.width*.08/2),this.gunY-(this.shootImg.height*.08/2),this.shootImg.width*.08,this.shootImg.height*.08);
 		}
 	}
 	getEnemy(){
 			this.enemyY += this.enemySpeed;
-			ctx.beginPath();
+			/*ctx.beginPath();
 			ctx.arc(this.enemyX,this.enemyY,this.spaceRad,0,2*Math.PI);
 			ctx.fillStyle = "white";
 			ctx.fill();
-			ctx.closePath();
+			ctx.closePath();*/
 			//ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.25/2),this.enemyY-(this.enemyImg.height*.25/2),this.enemyImg.width*.25,this.fireImg.enemyImg*.25);
-			//ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.12/2),this.enemyY-(this.enemyImg.height*.12/2),this.enemyImg.width*.12,this.enemyImg.height*.12);
+			ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.18/2),this.enemyY-(this.enemyImg.height*.18/2),this.enemyImg.width*.18,this.enemyImg.height*.18);
 	}		
 	getBoss(){
 		
@@ -213,7 +213,19 @@ class games{
 }
 
 
+function gameOver(){
+	console.log("yow");
+	let imgBg = new Image;
+	imgBg.src = "gameOver.png";
+	//ctx.drawImage(imgBg,canvas.width/2-(imgBg.width*.20/2),canvas.height/2-(imgBg.height*.20/2),imgBg.width*.20,imgBg.height*.20);
+	ctx.drawImage(imgBg,0,0,200,200);
+}
+
+
 function start(){
+	let imgBg = new Image;
+	imgBg.src = "gameOver.png";
+	
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	count -= 1;
 	fire -= 1;	
@@ -245,11 +257,19 @@ function start(){
 	//filter arr. remove those not in need
 	gameArr = gameArr.filter(x => x.life == true);
 	//animate background
+	//ctx.drawImage(imgBg,canvas.width/2-(imgBg.width*.30/2),canvas.height/2-(imgBg.height*.30/2),imgBg.width*.30,imgBg.height*.30);
+	
 	createBg.drawBackground();
+	
+	
 	if(thisGame){
 		requestAnimationFrame(start);
+	}else{
+		ctx.drawImage(imgBg,canvas.width/2-(imgBg.width*.35/2),canvas.height/2-(imgBg.height*.35/2),imgBg.width*.35,imgBg.height*.35);
+		//gameOver();
 	}
 }
+
 
 //on key down function
 window.onkeydown = function(e){
