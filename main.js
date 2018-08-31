@@ -20,7 +20,14 @@ let postX = canvas.width/2,
 	
 let keyPress = {a:0,w:0,d:0,s:0}
 
-let thisGame = true;
+let thisGame = false;
+
+let startButton = document.getElementsByClassName("tab")[0];
+
+let imgBg = new Image,
+	imgLogo = new Image;
+	imgBg.src = "gameOver.png";
+	imgLogo.src = "neverSpace.png";
 
 class background{
 	constructor(){
@@ -212,6 +219,25 @@ class games{
 	}
 }
 
+function onLoad(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	createBg.drawBackground();
+	ctx.drawImage(imgLogo,canvas.width/2-(imgLogo.width*.35/2),canvas.height/2-(imgLogo.height*.35/2),imgLogo.width*.35,imgLogo.height*.35);
+	if(!thisGame){
+		requestAnimationFrame(onLoad);
+	}
+}
+
+function startGame(){
+	thisGame = true;
+	postX = canvas.width/2;
+	postY = canvas.height - canvas.height * .08;
+	gameArr = [];
+	count = 20;
+	fire = 500;
+	start();
+}
+
 
 function gameOver(){
 	console.log("yow");
@@ -223,8 +249,8 @@ function gameOver(){
 
 
 function start(){
-	let imgBg = new Image;
-	imgBg.src = "gameOver.png";
+
+	startButton.style.display = "none"
 	
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	count -= 1;
@@ -266,6 +292,7 @@ function start(){
 		requestAnimationFrame(start);
 	}else{
 		ctx.drawImage(imgBg,canvas.width/2-(imgBg.width*.35/2),canvas.height/2-(imgBg.height*.35/2),imgBg.width*.35,imgBg.height*.35);
+		startButton.style.display = "block";
 		//gameOver();
 	}
 }
@@ -290,4 +317,5 @@ window.onkeyup = function(){
 }
 
 createBg = new background();
-start();
+onLoad();
+//start();
