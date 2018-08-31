@@ -22,12 +22,16 @@ let keyPress = {a:0,w:0,d:0,s:0}
 
 let thisGame = false;
 
+let score = 0;
+
 let startButton = document.getElementsByClassName("tab")[0];
 
 let imgBg = new Image,
-	imgLogo = new Image;
+	imgLogo = new Image,
+	imgScore = new Image;
 	imgBg.src = "gameOver.png";
 	imgLogo.src = "neverSpace.png";
+	imgScore.src = "score.png";
 
 class background{
 	constructor(){
@@ -108,29 +112,13 @@ class games{
 	triggerShoot(){
 		this.gunY -= 8;
 		if(this.gunPlace == "left"){
-			/*ctx.beginPath();
-			ctx.arc(this.gunX-this.offset,this.gunY,15,0,2*Math.PI);
-			ctx.strokeStyle = "white"
-			ctx.stroke();
-			ctx.closePath();*/
 			ctx.drawImage(this.shootImg,this.gunX-this.offset-(this.shootImg.width*.08/2),this.gunY-(this.shootImg.height*.08/2),this.shootImg.width*.08,this.shootImg.height*.08);
 		}else if(this.gunPlace == "right"){
-			/*ctx.beginPath();
-			ctx.arc(this.gunX+this.offset,this.gunY,15,0,2*Math.PI);
-			ctx.strokeStyle = "white"
-			ctx.stroke();
-			ctx.closePath();*/
 			ctx.drawImage(this.shootImg,this.gunX+this.offset-(this.shootImg.width*.08/2),this.gunY-(this.shootImg.height*.08/2),this.shootImg.width*.08,this.shootImg.height*.08);
 		}
 	}
 	getEnemy(){
 			this.enemyY += this.enemySpeed;
-			/*ctx.beginPath();
-			ctx.arc(this.enemyX,this.enemyY,this.spaceRad,0,2*Math.PI);
-			ctx.fillStyle = "white";
-			ctx.fill();
-			ctx.closePath();*/
-			//ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.25/2),this.enemyY-(this.enemyImg.height*.25/2),this.enemyImg.width*.25,this.fireImg.enemyImg*.25);
 			ctx.drawImage(this.enemyImg,this.enemyX-(this.enemyImg.width*.18/2),this.enemyY-(this.enemyImg.height*.18/2),this.enemyImg.width*.18,this.enemyImg.height*.18);
 	}		
 	getBoss(){
@@ -138,15 +126,7 @@ class games{
 	}
 	getFireball(){
 		if(this.type == 'fire'){
-			
 			this.fireY += 15
-			
-			/*ctx.beginPath();
-			ctx.arc(this.fireX,this.fireY,30,0,2*Math.PI);
-			ctx.fiilStyle = "yellow";
-			ctx.fill();
-			ctx.closePath()*/
-			//ctx.drawImage(this.enemyImg,this.fireX-(this.enemyImg.width*.25/2),this.fireY-(this.enemyImg.height*.25/2),this.enemyImg.width*.25,this.enemyImg.height*.25);
 			ctx.drawImage(this.fireImg,this.fireX-(this.fireImg.width*.25/2),this.fireY-(this.fireImg.height*.25/2),this.fireImg.width*.25,this.fireImg.height*.25);
 		}
 	}
@@ -182,13 +162,12 @@ class games{
 					this.gun = false;
 					if(x.enemyLife == 0){
 						//if life is zero make it false
+						score += 5;
 						x.enemy = false;
 					}
 				}
 			});
 		}
-		
-		
 		//change life from true to false if the obj is not needed anymore.
 		if(this.gunY < 0 && this.enemyY > canvas.height && this.type == 'none'){
 			this.life = false;
@@ -223,6 +202,12 @@ function onLoad(){
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	createBg.drawBackground();
 	ctx.drawImage(imgLogo,canvas.width/2-(imgLogo.width*.35/2),canvas.height/2-(imgLogo.height*.35/2),imgLogo.width*.35,imgLogo.height*.35);
+	ctx.drawImage(imgScore,(canvas.width-canvas.width*.15)-(imgScore.width*.40/2),(canvas.height*.06)-(imgScore.height*.40/2),imgScore.width*.40,imgScore.height*.40);
+	
+	ctx.font = "15px impact";
+	ctx.fillStyle = "white"
+	ctx.fillText(score, canvas.width-canvas.width*.25, canvas.height*.05);
+	
 	if(!thisGame){
 		requestAnimationFrame(onLoad);
 	}
@@ -235,6 +220,7 @@ function startGame(){
 	gameArr = [];
 	count = 20;
 	fire = 500;
+	score = 0;
 	start();
 }
 
@@ -243,7 +229,6 @@ function gameOver(){
 	console.log("yow");
 	let imgBg = new Image;
 	imgBg.src = "gameOver.png";
-	//ctx.drawImage(imgBg,canvas.width/2-(imgBg.width*.20/2),canvas.height/2-(imgBg.height*.20/2),imgBg.width*.20,imgBg.height*.20);
 	ctx.drawImage(imgBg,0,0,200,200);
 }
 
@@ -256,6 +241,9 @@ function start(){
 	count -= 1;
 	fire -= 1;	
 	//autofire
+	
+
+	
 	if(count == 0){
 		game = new games(postX,postY,35,'left','none');
 		gameArr.push(game);
@@ -287,6 +275,10 @@ function start(){
 	
 	createBg.drawBackground();
 	
+	ctx.drawImage(imgScore,(canvas.width-canvas.width*.15)-(imgScore.width*.40/2),(canvas.height*.06)-(imgScore.height*.40/2),imgScore.width*.40,imgScore.height*.40);
+	ctx.font = "15px impact";
+	ctx.fillStyle = "white"
+	ctx.fillText(score, canvas.width-canvas.width*.25, canvas.height*.05);
 	
 	if(thisGame){
 		requestAnimationFrame(start);
